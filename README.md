@@ -1,4 +1,4 @@
-# FourHorseman
+# Four Horseman
  **The four horseman of the apocalypse in Wurm**
 
 An **Apocalypse Stone** will spawn in the world. The horseman **Conquest** will spawn first. Once killed, the next horseman will spawn named **War**. Once killed, the next horseman will spawn named **Famine**. Once killed, the last horseman will spawn named **Death**.
