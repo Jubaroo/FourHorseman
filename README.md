@@ -6,3 +6,6 @@ An **Apocalypse Stone** will spawn in the world. The horseman **Conquest** will 
 If one horseman is killed, players will get the *title and achievement*: **Horseman Slayer**.
 If Death is killed, and the apocalypse is ended, players will get the *title*: **Apocalypse-ender** and the *achievement*: **Death and Taxes**.
 
+Plans: 
+ * horseman spawn on horses
+ * event to lead up to the fourth seal being broken to summon the 4 horseman
