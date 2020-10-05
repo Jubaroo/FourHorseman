@@ -1,12 +1,5 @@
 package org.requiem.mods.wurm.fourhorseman;
 
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.NotFoundException;
-import javassist.expr.ExprEditor;
-import javassist.expr.MethodCall;
-import org.gotti.wurmunlimited.modloader.classhooks.HookManager;
 import org.gotti.wurmunlimited.modloader.interfaces.*;
 import org.requiem.mods.wurm.fourhorseman.titles.CustomAchievements;
 import org.requiem.mods.wurm.fourhorseman.titles.CustomTitles;
@@ -46,22 +39,6 @@ public class FourHorseman implements WurmServerMod, Configurable, ItemTemplatesC
 
     @Override
     public void init() {
-        try {
-            ClassPool classPool = HookManager.getInstance().getClassPool();
-            CtClass ctCreature = classPool.get("com.wurmonline.server.creatures.Creature");
-            // Modify creatures on death
-            ctCreature.getDeclaredMethod("die").instrument(new ExprEditor() {
-                public void edit(MethodCall m) throws CannotCompileException {
-                    if (m.getMethodName().equals("setRotation")) {
-                        m.replace("$_ = $proceed($$);"
-                                + Spawn.class.getName() + ".checkLootTable(this, corpse);");
-                        logger.info("Instrumented setRotation to call insertCorpseItems as well.");
-                    }
-                }
-            });
-        } catch (NotFoundException | CannotCompileException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

@@ -5,7 +5,6 @@ import com.wurmonline.server.bodys.Wound;
 import com.wurmonline.server.combat.ArmourTemplate;
 import com.wurmonline.server.creatures.Creature;
 import com.wurmonline.server.creatures.CreatureTemplate;
-import com.wurmonline.server.items.ItemList;
 import com.wurmonline.server.skills.SkillList;
 import com.wurmonline.shared.constants.CreatureTypes;
 import com.wurmonline.shared.constants.ItemMaterials;
@@ -31,8 +30,8 @@ public class CustomCreatures {
     }
 
     static void createHorsemanConquestTemplate() throws NoSuchFieldException, IllegalAccessException {
-        final int[] types = {CreatureTypes.C_TYPE_MOVE_GLOBAL, CreatureTypes.C_TYPE_UNDEAD, CreatureTypes.C_TYPE_MONSTER, CreatureTypes.C_TYPE_HUMAN, CreatureTypes.C_TYPE_AGG_HUMAN, CreatureTypes.C_TYPE_HUNTING, CreatureTypes.C_TYPE_NON_NEWBIE, CreatureTypes.C_TYPE_NO_REBIRTH};
-        final int[] itemsButchered = new int[]{ItemList.heart};
+        final int[] types = {CreatureTypes.C_TYPE_MOVE_LOCAL, CreatureTypes.C_TYPE_UNDEAD, CreatureTypes.C_TYPE_MONSTER, CreatureTypes.C_TYPE_HUMAN, CreatureTypes.C_TYPE_AGG_HUMAN, CreatureTypes.C_TYPE_HUNTING, CreatureTypes.C_TYPE_NON_NEWBIE, CreatureTypes.C_TYPE_NO_REBIRTH};
+        final int[] itemsButchered = new int[]{};
         final CreatureTemplate temp = new CreatureTemplateBuilder("horseman.creature.conquest")
                 .name("Conquest")
                 .description("Conquest, the rider of the White Horse (sometimes referred to as the White Rider) He carries a bow, and wears a victor's crown.")
@@ -79,8 +78,8 @@ public class CustomCreatures {
     }
 
     static void createHorsemanWarTemplate() throws NoSuchFieldException, IllegalAccessException {
-        final int[] types = {CreatureTypes.C_TYPE_MOVE_GLOBAL, CreatureTypes.C_TYPE_UNDEAD, CreatureTypes.C_TYPE_MONSTER, CreatureTypes.C_TYPE_HUMAN, CreatureTypes.C_TYPE_AGG_HUMAN, CreatureTypes.C_TYPE_HUNTING, CreatureTypes.C_TYPE_NON_NEWBIE, CreatureTypes.C_TYPE_NO_REBIRTH};
-        final int[] itemsButchered = new int[]{ItemList.heart};
+        final int[] types = {CreatureTypes.C_TYPE_MOVE_LOCAL, CreatureTypes.C_TYPE_UNDEAD, CreatureTypes.C_TYPE_MONSTER, CreatureTypes.C_TYPE_HUMAN, CreatureTypes.C_TYPE_AGG_HUMAN, CreatureTypes.C_TYPE_HUNTING, CreatureTypes.C_TYPE_NON_NEWBIE, CreatureTypes.C_TYPE_NO_REBIRTH};
+        final int[] itemsButchered = new int[]{};
         final CreatureTemplate temp = new CreatureTemplateBuilder("horseman.creature.war")
                 .name("War")
                 .description("The rider of the second horse is often taken to represent War (he is often pictured holding a sword upwards as though ready for battle) or mass slaughter. His horse's color is red (πυρρός, from πῦρ, fire); and in some translations, the color is specifically a \"fiery\" red. The color red, as well as the rider's possession of a great sword, suggests blood that is to be spilled.")
@@ -119,16 +118,14 @@ public class CustomCreatures {
                 .maxPopulationOfCreatures(1)
                 .build();
 
-        temp.setCreatureAI(new GuardianCreatureAI());
-
         ReflectionUtil.setPrivateField(temp, ReflectionUtil.getField(CreatureTemplate.class, "corpsename"), "horse.butchered.");
 
         HORSEMAN_WAR_CID = temp.getTemplateId();
     }
 
     static void createHorsemanFamineTemplate() throws NoSuchFieldException, IllegalAccessException {
-        final int[] types = {CreatureTypes.C_TYPE_MOVE_GLOBAL, CreatureTypes.C_TYPE_UNDEAD, CreatureTypes.C_TYPE_MONSTER, CreatureTypes.C_TYPE_HUMAN, CreatureTypes.C_TYPE_AGG_HUMAN, CreatureTypes.C_TYPE_HUNTING, CreatureTypes.C_TYPE_NON_NEWBIE, CreatureTypes.C_TYPE_NO_REBIRTH};
-        final int[] itemsButchered = new int[]{ItemList.heart};
+        final int[] types = {CreatureTypes.C_TYPE_MOVE_LOCAL, CreatureTypes.C_TYPE_UNDEAD, CreatureTypes.C_TYPE_MONSTER, CreatureTypes.C_TYPE_HUMAN, CreatureTypes.C_TYPE_AGG_HUMAN, CreatureTypes.C_TYPE_HUNTING, CreatureTypes.C_TYPE_NON_NEWBIE, CreatureTypes.C_TYPE_NO_REBIRTH};
+        final int[] itemsButchered = new int[]{};
         final CreatureTemplate temp = new CreatureTemplateBuilder("horseman.creature.famine")
                 .name("Famine")
                 .description("The third Horseman rides a black horse and is popularly understood to be Famine as the Horseman carries a pair of balances or weighing scales, indicating the way that bread would have been weighed during a famine.")
@@ -167,16 +164,14 @@ public class CustomCreatures {
                 .maxPopulationOfCreatures(1)
                 .build();
 
-        temp.setCreatureAI(new GuardianCreatureAI());
-
         ReflectionUtil.setPrivateField(temp, ReflectionUtil.getField(CreatureTemplate.class, "corpsename"), "horse.butchered.");
 
         HORSEMAN_FAMINE_CID = temp.getTemplateId();
     }
 
     static void createHorsemanDeathTemplate() throws NoSuchFieldException, IllegalAccessException {
-        final int[] types = {CreatureTypes.C_TYPE_MOVE_GLOBAL, CreatureTypes.C_TYPE_UNDEAD, CreatureTypes.C_TYPE_MONSTER, CreatureTypes.C_TYPE_HUMAN, CreatureTypes.C_TYPE_AGG_HUMAN, CreatureTypes.C_TYPE_HUNTING, CreatureTypes.C_TYPE_NON_NEWBIE, CreatureTypes.C_TYPE_NO_REBIRTH};
-        final int[] itemsButchered = new int[]{ItemList.heart};
+        final int[] types = {CreatureTypes.C_TYPE_MOVE_LOCAL, CreatureTypes.C_TYPE_UNDEAD, CreatureTypes.C_TYPE_MONSTER, CreatureTypes.C_TYPE_HUMAN, CreatureTypes.C_TYPE_AGG_HUMAN, CreatureTypes.C_TYPE_HUNTING, CreatureTypes.C_TYPE_NON_NEWBIE, CreatureTypes.C_TYPE_NO_REBIRTH};
+        final int[] itemsButchered = new int[]{};
         final CreatureTemplate temp = new CreatureTemplateBuilder("horseman.creature.death")
                 .name("Death")
                 .description("The fourth and final Horseman is named Death. Known as \"Thanatos\", of all the riders, he is the only one to whom the text itself explicitly gives a name. Unlike the other three, he is not described carrying a weapon or other object, instead he is followed by Hades (the resting place of the dead). However, illustrations commonly depict him carrying a scythe (like the Grim Reaper), sword, or other implement.")
@@ -214,8 +209,6 @@ public class CustomCreatures {
                 .alignment(100f)
                 .maxPopulationOfCreatures(1)
                 .build();
-
-        temp.setCreatureAI(new GuardianCreatureAI());
 
         ReflectionUtil.setPrivateField(temp, ReflectionUtil.getField(CreatureTemplate.class, "corpsename"), "horse.butchered.");
 

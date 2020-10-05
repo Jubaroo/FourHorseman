@@ -135,11 +135,22 @@ public class GuardianCreatureAI extends CreatureAI {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        if (CustomCreatures.isHorseman(creature))
+        if (creature.getTemplate().getTemplateId() == CustomCreatures.HORSEMAN_CONQUEST_CID) {
+            // Spawn the horseman war when conquest dies
+            Spawn.spawnHorseman(creature, CustomCreatures.HORSEMAN_WAR_CID);
+        } else if (creature.getTemplate().getTemplateId() == CustomCreatures.HORSEMAN_WAR_CID) {
+            // Spawn the horseman famine when war dies
+            Spawn.spawnHorseman(creature, CustomCreatures.HORSEMAN_FAMINE_CID);
+        } else if (creature.getTemplate().getTemplateId() == CustomCreatures.HORSEMAN_FAMINE_CID) {
+            // Spawn the horseman death when famine dies
+            Spawn.spawnHorseman(creature, CustomCreatures.HORSEMAN_DEATH_CID);
+        } else if (CustomCreatures.isHorseman(creature)) {
+            // give a silver achievement when any horseman is killed
             killers.forEach(p -> CustomAchievements.triggerAchievement(p, CustomAchievements.horsemanKiller));
-        else if (creature.getTemplate().getTemplateId() == CustomCreatures.HORSEMAN_DEATH_CID)
-            killers.forEach(p -> CustomAchievements.triggerAchievement(p, CustomAchievements.horsemanKiller));
-
+        } else if (creature.getTemplate().getTemplateId() == CustomCreatures.HORSEMAN_DEATH_CID) {
+            // give a gold achievement when Death is killed
+            killers.forEach(p -> CustomAchievements.triggerAchievement(p, CustomAchievements.deathKiller));
+        }
         return false;
     }
 

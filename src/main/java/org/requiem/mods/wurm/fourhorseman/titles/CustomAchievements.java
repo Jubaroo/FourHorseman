@@ -14,7 +14,7 @@ public class CustomAchievements {
 
     public static void register() {
         horsemanKiller = ModAchievements.build(ModConfig.horsemanKillerAchId)
-                .name("Horseman Killer")
+                .name("Horseman Slayer")
                 .description("You killed a horseman of the apocalypse")
                 .achievementType(MiscConstants.A_TYPE_SILVER)
                 .buildAndRegister();
@@ -28,10 +28,10 @@ public class CustomAchievements {
 
     private static Titles.Title getAwardedTitle(Achievement ach) {
         int count = ach.getCounter();
-        if (ach.getTemplate() == horsemanKiller) {
+        if (ach.getTemplate() == deathKiller) {
             if (count >= 1)
                 return Titles.Title.getTitle(ModConfig.apocalypseEnderTitleId);
-        } else if (ach.getTemplate() == deathKiller) {
+        } else if (ach.getTemplate() == horsemanKiller) {
             if (count >= 1)
                 return Titles.Title.getTitle(ModConfig.horsemanSlayerTitleId);
         }

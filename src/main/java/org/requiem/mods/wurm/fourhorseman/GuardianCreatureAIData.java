@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class GuardianCreatureAIData extends CreatureAIData {
     public static final Set<Item> apocalypseStone = new HashSet<>();
-    public static final Map<Long, Set<Creature>> guards = new HashMap<>();
+    public static final Map<Long, Set<Creature>> horseman = new HashMap<>();
     public Item guarded;
     public int pathAttempts;
 
@@ -20,7 +20,7 @@ public class GuardianCreatureAIData extends CreatureAIData {
     }
 
     public static void addGuard(Item item, Creature guard) {
-        guards.get(item.getWurmId()).add(guard);
+        horseman.get(item.getWurmId()).add(guard);
     }
 
     public boolean tryFindGuarded() {
