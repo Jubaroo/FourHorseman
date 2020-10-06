@@ -14,8 +14,6 @@ import com.wurmonline.shared.constants.Enchants;
 import com.wurmonline.shared.constants.ItemMaterials;
 import com.wurmonline.shared.constants.SoundNames;
 
-import java.io.IOException;
-
 public class Spawn {
 
     private static void applyEnchant(Item item, byte enchant, float power) {
@@ -35,7 +33,7 @@ public class Spawn {
         return ItemFactory.createItem(itemId, 50f + (Server.rand.nextFloat() * 30f), ItemMaterials.MATERIAL_STEEL, MiscConstants.COMMON, "Black Knight");
     }
 
-    private static void equipHorseman(Creature creature) {
+    public static void equipHorseman(Creature creature) {
         try {
             Item twoHandSword = horsemanItemSpawn(ItemList.swordTwoHander);
             Item greatHelm = horsemanItemSpawn(ItemList.helmetGreat);
@@ -50,9 +48,7 @@ public class Spawn {
             Item steelRightShoulder = horsemanItemSpawn(ItemList.shoulderPads11);
             Item steelLeftShoulder = horsemanItemSpawn(ItemList.shoulderPads11);
 
-            creature.setSex(MiscConstants.SEX_MALE, true);
-            creature.setAlignment(-100f);
-            creature.setKingdomId(MiscConstants.KINGDOM_HOTS, true, true, true);
+            //creature.setKingdomId(MiscConstants.KINGDOM_HOTS, true, false, creature.hasLink());
             //SoundPlayer.playSound(dramatic_sound, creature, 0f);// play dramatic sound
             // Sword
             int roll = Server.rand.nextInt(100);
@@ -147,7 +143,7 @@ public class Spawn {
             creature.getBody().getBodyPart(BodyTemplate.torso).insertItem(steelChest, true);
             creature.getBody().getBodyPart(BodyTemplate.leftShoulder).insertItem(steelLeftShoulder, true);
             creature.getBody().getBodyPart(BodyTemplate.rightShoulder).insertItem(steelRightShoulder, true);
-        } catch (NoSpaceException | FailedException | NoSuchTemplateException | IOException e) {
+        } catch (NoSpaceException | FailedException | NoSuchTemplateException e) {
             e.printStackTrace();
         }
     }
@@ -156,28 +152,41 @@ public class Spawn {
         try {
             float x = horseman.getPosX();
             float y = horseman.getPosY();
-                CreatureTemplate tpl = CreatureTemplateFactory.getInstance().getTemplate(cid);
-            Creature newHorseman = Creature.doNew(tpl.getTemplateId(), false, x, y, Server.rand.nextFloat() * 360f, horseman.getLayer(), tpl.getName(), MiscConstants.SEX_MALE, horseman.getKingdomId(), BodyTemplate.TYPE_HUMAN, false, /*age*/(byte) (20 + Server.rand.nextInt(50)));
-            Creature horse = Creature.doNew(CreatureTemplateIds.HELL_HORSE_CID, newHorseman.getPosX(), newHorseman.getPosY(), 365f, newHorseman.getLayer(), newHorseman.getName(), Server.rand.nextBoolean() ? MiscConstants.SEX_MALE : MiscConstants.SEX_FEMALE);
+            CreatureTemplate template = CreatureTemplateFactory.getInstance().getTemplate(cid);
+            Creature newHorseman = Creature.doNew(template.getTemplateId(), false, x, y, Server.rand.nextFloat() * 360f, horseman.getLayer(), template.getName(), MiscConstants.SEX_MALE, horseman.getKingdomId(), BodyTemplate.TYPE_HUMAN, false, /*age*/(byte) (20 + Server.rand.nextInt(50)));
+            Creature horse;
+            //TODO
+            // FIX ME
+            switch (cid) {
+                case CustomCreatures.horsemanConquestId:
+                    horse = Creature.doNew(CustomCreatures.horsemanConquestHorseId, newHorseman.getPosX(), newHorseman.getPosY(), 365f, newHorseman.getLayer(), String.format("%s's steed", newHorseman.getNameWithoutPrefixes()), Server.rand.nextBoolean() ? MiscConstants.SEX_MALE : MiscConstants.SEX_FEMALE);
+                    break;
+                case CustomCreatures.horsemanWarId:
+                    horse = Creature.doNew(CustomCreatures.horsemanWarHorseId, newHorseman.getPosX(), newHorseman.getPosY(), 365f, newHorseman.getLayer(), String.format("%s's steed", newHorseman.getNameWithoutPrefixes()), Server.rand.nextBoolean() ? MiscConstants.SEX_MALE : MiscConstants.SEX_FEMALE);
+                    break;
+                case CustomCreatures.horsemanFamineId:
+                    horse = Creature.doNew(CustomCreatures.horsemanFamineHorseId, newHorseman.getPosX(), newHorseman.getPosY(), 365f, newHorseman.getLayer(), String.format("%s's steed", newHorseman.getNameWithoutPrefixes()), Server.rand.nextBoolean() ? MiscConstants.SEX_MALE : MiscConstants.SEX_FEMALE);
+                    break;
+                case CustomCreatures.horsemanDeathId:
+                    horse = Creature.doNew(CustomCreatures.horsemanDeathHorseId, newHorseman.getPosX(), newHorseman.getPosY(), 365f, newHorseman.getLayer(), String.format("%s's steed", newHorseman.getNameWithoutPrefixes()), Server.rand.nextBoolean() ? MiscConstants.SEX_MALE : MiscConstants.SEX_FEMALE);
+                    break;
+                default:
+                    horse = Creature.doNew(CreatureTemplateIds.HORSE_CID, newHorseman.getPosX(), newHorseman.getPosY(), 365f, newHorseman.getLayer(), String.format("%s's steed", newHorseman.getNameWithoutPrefixes()), Server.rand.nextBoolean() ? MiscConstants.SEX_MALE : MiscConstants.SEX_FEMALE);
+            }
             // hopefully make the new horseman mount the newly spawned horse
             Vehicle vehicle;
             vehicle = Vehicles.getVehicle(horse);
-            final MountAction m = new MountAction(newHorseman, null, vehicle, 0, true, 0);
-            newHorseman.setMountAction(m);
+            final MountAction mountAction = new MountAction(newHorseman, null, vehicle, 0, true, 0);
+            newHorseman.setMountAction(mountAction);
             newHorseman.setVehicle(horse.getWurmId(), true, (byte) 0);
             // make a horse sound when it is spawned
             SoundPlayer.playSound(SoundNames.HIT_HORSE_SND, newHorseman, 0f);
             // display a message when spawned
             FourHorseman.logInfo(String.format("Spawning %s, a horseman of the apocalypse!", newHorseman.getNameWithoutPrefixes()));
-            if (cid == CustomCreatures.HORSEMAN_CONQUEST_CID) {
-                Server.getInstance().broadCastAction("The four seals have been broken! Mankind shall be judged and punished accordingly!", newHorseman, 30);
-            }
-            Server.getInstance().broadCastAction(String.format("The horseman %s appears from the void ready to fight!", newHorseman.getTemplate().getName()), newHorseman, 30);
+            String message = String.format("The horseman %s appears from the void ready to fight!", newHorseman.getNameWithoutPrefixes());
+            Server.getInstance().broadCastAlert(message, true, (byte) 1);
             // equip the horseman with a weapon and armor
             equipHorseman(newHorseman);
-                // put the horse and horseman into the world
-                horse.putInWorld();
-                newHorseman.putInWorld();
         } catch (Exception e) {
             FourHorseman.logException(String.format("Error in Spawning %s", horseman.getTemplate().getName()), e);
             e.printStackTrace();

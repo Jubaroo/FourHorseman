@@ -1,6 +1,7 @@
 package org.requiem.mods.wurm.fourhorseman;
 
 import com.wurmonline.mesh.Tiles;
+import com.wurmonline.server.Items;
 import com.wurmonline.server.Players;
 import com.wurmonline.server.Server;
 import com.wurmonline.server.WurmId;
@@ -11,16 +12,14 @@ import com.wurmonline.server.creatures.NoSuchCreatureException;
 import com.wurmonline.server.creatures.ai.CreatureAI;
 import com.wurmonline.server.creatures.ai.CreatureAIData;
 import com.wurmonline.server.creatures.ai.PathTile;
+import com.wurmonline.server.items.Item;
 import com.wurmonline.server.players.Player;
 import com.wurmonline.server.zones.NoSuchZoneException;
 import com.wurmonline.server.zones.Zones;
 import com.wurmonline.shared.constants.CounterTypes;
 import org.requiem.mods.wurm.fourhorseman.titles.CustomAchievements;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GuardianCreatureAI extends CreatureAI {
@@ -135,22 +134,42 @@ public class GuardianCreatureAI extends CreatureAI {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        if (creature.getTemplate().getTemplateId() == CustomCreatures.HORSEMAN_CONQUEST_CID) {
+        if (creature.getTemplate().getTemplateId() == CustomCreatures.horsemanConquestId) {
             // Spawn the horseman war when conquest dies
-            Spawn.spawnHorseman(creature, CustomCreatures.HORSEMAN_WAR_CID);
-        } else if (creature.getTemplate().getTemplateId() == CustomCreatures.HORSEMAN_WAR_CID) {
+            Spawn.spawnHorseman(creature, CustomCreatures.horsemanWarId);
+            for (Item item : Items.getAllItems()) {
+                if (item.getTemplateId() == CustomItems.apocalypseStoneId) {
+                    ApocalypseStoneTracker.addGuard(item, creature);
+                    ApocalypseStoneTracker.horseman.put(item.getWurmId(), new HashSet<>());
+                }
+            }
+        } else if (creature.getTemplate().getTemplateId() == CustomCreatures.horsemanWarId) {
             // Spawn the horseman famine when war dies
-            Spawn.spawnHorseman(creature, CustomCreatures.HORSEMAN_FAMINE_CID);
-        } else if (creature.getTemplate().getTemplateId() == CustomCreatures.HORSEMAN_FAMINE_CID) {
+            Spawn.spawnHorseman(creature, CustomCreatures.horsemanFamineId);
+            for (Item item : Items.getAllItems()) {
+                if (item.getTemplateId() == CustomItems.apocalypseStoneId) {
+                    ApocalypseStoneTracker.addGuard(item, creature);
+                    ApocalypseStoneTracker.horseman.put(item.getWurmId(), new HashSet<>());
+                }
+            }
+        } else if (creature.getTemplate().getTemplateId() == CustomCreatures.horsemanFamineId) {
             // Spawn the horseman death when famine dies
-            Spawn.spawnHorseman(creature, CustomCreatures.HORSEMAN_DEATH_CID);
+            Spawn.spawnHorseman(creature, CustomCreatures.horsemanDeathId);
+            for (Item item : Items.getAllItems()) {
+                if (item.getTemplateId() == CustomItems.apocalypseStoneId) {
+                    ApocalypseStoneTracker.addGuard(item, creature);
+                    ApocalypseStoneTracker.horseman.put(item.getWurmId(), new HashSet<>());
+                }
+            }
         } else if (CustomCreatures.isHorseman(creature)) {
             // give a silver achievement when any horseman is killed
             killers.forEach(p -> CustomAchievements.triggerAchievement(p, CustomAchievements.horsemanKiller));
-        } else if (creature.getTemplate().getTemplateId() == CustomCreatures.HORSEMAN_DEATH_CID) {
+        } else if (creature.getTemplate().getTemplateId() == CustomCreatures.horsemanDeathId) {
             // give a gold achievement when Death is killed
             killers.forEach(p -> CustomAchievements.triggerAchievement(p, CustomAchievements.deathKiller));
+            ApocalypseStoneTracker.removeStones();
         }
+
         return false;
     }
 

@@ -1,5 +1,6 @@
 package org.requiem.mods.wurm.fourhorseman;
 
+import com.wurmonline.server.items.Item;
 import org.gotti.wurmunlimited.modloader.interfaces.*;
 import org.requiem.mods.wurm.fourhorseman.titles.CustomAchievements;
 import org.requiem.mods.wurm.fourhorseman.titles.CustomTitles;
@@ -9,7 +10,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FourHorseman implements WurmServerMod, Configurable, ItemTemplatesCreatedListener, ServerStartedListener, ServerPollListener {
+public class FourHorseman implements WurmServerMod, Configurable, ItemTemplatesCreatedListener, ServerStartedListener, ServerPollListener, ServerShutdownListener {
     private static final Logger logger = Logger.getLogger("FourHorseman");
 
     public static void logException(String msg, Throwable e) {
@@ -44,10 +45,7 @@ public class FourHorseman implements WurmServerMod, Configurable, ItemTemplatesC
     @Override
     public void onItemTemplatesCreated() {
         try {
-            CustomCreatures.createHorsemanConquestTemplate();
-            CustomCreatures.createHorsemanWarTemplate();
-            CustomCreatures.createHorsemanFamineTemplate();
-            CustomCreatures.createHorsemanDeathTemplate();
+            CustomCreatures.registerCustomCreatures();
             CustomItems.registerApocalypseStone();
         } catch (NoSuchFieldException | IllegalAccessException | IOException e) {
             e.printStackTrace();
@@ -63,6 +61,15 @@ public class FourHorseman implements WurmServerMod, Configurable, ItemTemplatesC
     @Override
     public void onServerPoll() {
         ApocalypseStoneTracker.tick();
+    }
+
+    @Override
+    public void onServerShutdown() {
+        ApocalypseStoneTracker.removeStones();
+    }
+
+    public String getVersion() {
+        return "1.0";
     }
 
 }

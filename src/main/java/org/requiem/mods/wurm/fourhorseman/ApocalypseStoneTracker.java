@@ -2,6 +2,8 @@ package org.requiem.mods.wurm.fourhorseman;
 
 import com.wurmonline.mesh.Tiles;
 import com.wurmonline.server.FailedException;
+import com.wurmonline.server.Items;
+import com.wurmonline.server.MiscConstants;
 import com.wurmonline.server.Server;
 import com.wurmonline.server.creatures.Creature;
 import com.wurmonline.server.items.Item;
@@ -29,7 +31,7 @@ public class ApocalypseStoneTracker {
     }
 
     public static void apocalypseStoneRemoved(Item apocalypseStone) {
-        FourHorseman.logInfo(String.format("Removing apocalypseStone %d", apocalypseStone.getWurmId()));
+        FourHorseman.logInfo(String.format("Removing Apocalypse Stone %d at %d %d", apocalypseStone.getWurmId(), apocalypseStone.getTileX(), apocalypseStone.getTileY()));
         apocalypseStones.remove(apocalypseStone);
         Set<Creature> horsemanToRemove = horseman.remove(apocalypseStone.getWurmId());
         if (horsemanToRemove != null) {
@@ -38,7 +40,12 @@ public class ApocalypseStoneTracker {
     }
 
     public static void tick() {
-        if (apocalypseStones.size() < 1)
+        for (Item item : Items.getAllItems()) {
+            if (item.getTemplateId() == CustomItems.apocalypseStoneId) {
+                ApocalypseStoneTracker.addApocalypseStone(item);
+            }
+        }
+        if (apocalypseStones.size() == 0)
             spawnRandomApocalypseStone();
         if (System.currentTimeMillis() - lastCheck > 10000) {
             lastCheck = System.currentTimeMillis();
@@ -57,34 +64,51 @@ public class ApocalypseStoneTracker {
 
     public static void started() {
         if (apocalypseStones.size() > 0)
-            FourHorseman.logInfo(String.format("Loaded %d apocalypseStone", apocalypseStones.size()));
+            FourHorseman.logInfo(String.format("Loaded %d Apocalypse Stones", apocalypseStones.size()));
+        for (Item item : Items.getAllItems()) {
+            if (apocalypseStones.size() > 0) {
+                if (item.getTemplateId() == CustomItems.apocalypseStoneId) {
+                    FourHorseman.logInfo(String.format("Apocalypse Stone located and remembered, with name: %s, templateId: %d ,and wurmId: %d", item.getName(), CustomItems.apocalypseStoneId, item.getWurmId()));
+                    addApocalypseStone(item);
+                }
+            }
+            break;
+        }
+    }
+
+    public static void removeStones() {
+        for (int i = 0; i < apocalypseStones.size(); i++) {
+            for (Item item : Items.getAllItems()) {
+                if (item.getTemplateId() == CustomItems.apocalypseStoneId) {
+                    apocalypseStoneRemoved(item);
+                }
+            }
+        }
     }
 
     public static void spawnGravestoneAt(VolaTile vt) {
         try {
-            Item gravestone = ItemFactory.createItem(CustomItems.apocalypseStoneId, 99f, (byte) 0, null);
-            vt.addItem(gravestone, false, false);
-            FourHorseman.logInfo(String.format("Spawned gravestone at %d,%d", vt.tilex, vt.tiley));
-            addApocalypseStone(gravestone);
-            for (int i = 0; i < 1; i++) {
-                try {
-                    int tpl;
-                    tpl = CustomCreatures.HORSEMAN_CONQUEST_CID;
-                    Creature spawned = Creature.doNew(
-                            tpl,
-                            CreatureTypes.C_MOD_NONE,
-                            gravestone.getPosX() - 5f + Server.rand.nextFloat() * 10,
-                            gravestone.getPosY() - 5f + Server.rand.nextFloat() * 10,
-                            Server.rand.nextInt(360),
-                            gravestone.isOnSurface() ? 0 : -1, "", (byte) 0);
-                    GuardianCreatureAIData.get(spawned).guarded = gravestone;
-                    addGuard(gravestone, spawned);
-                } catch (Exception e) {
-                    FourHorseman.logException("Error spawning defenders for gravestone", e);
-                }
+            Item apocalypseStone = ItemFactory.createItem(CustomItems.apocalypseStoneId, 99f, MiscConstants.COMMON, null);
+            vt.addItem(apocalypseStone, false, false);
+            FourHorseman.logInfo(String.format("Spawned Apocalypse %d Stone at %d,%d",apocalypseStone.getWurmId(), vt.tilex, vt.tiley));
+            addApocalypseStone(apocalypseStone);
+            try {
+                Creature spawned = Creature.doNew(CustomCreatures.horsemanConquestId, CreatureTypes.C_MOD_NONE, apocalypseStone.getPosX() - 5f + Server.rand.nextFloat() * 10, apocalypseStone.getPosY() - 5f + Server.rand.nextFloat() * 10, Server.rand.nextInt(360), apocalypseStone.isOnSurface() ? 0 : -1, "", MiscConstants.SEX_MALE);
+                GuardianCreatureAIData.get(spawned).guarded = apocalypseStone;
+                addGuard(apocalypseStone, spawned);
+                // equip the horseman with a weapon and armor
+                Spawn.equipHorseman(spawned);
+                // display a message when spawned
+                String m1 = "The four seals have been broken! Mankind shall be judged and punished accordingly!";
+                String m2 = "The 4 Horseman of the apocalypse have begun to enter our mortal realm to end the lives of all living things. Stop them before they complete their task.";
+                Server.getInstance().broadCastAlert(m1, true, (byte) 1);
+                Server.getInstance().broadCastAlert(m2, true, (byte) 1);
+            } catch (Exception e) {
+                FourHorseman.logException("Error spawning defenders for Apocalypse Stone", e);
             }
+
         } catch (FailedException | NoSuchTemplateException e) {
-            FourHorseman.logException("Error spawning gravestone", e);
+            FourHorseman.logException("Error spawning Apocalypse Stone", e);
         }
 
     }
